@@ -9,3 +9,138 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model students {
+  id              String            @id @default(uuid()) @db.Uuid
+  full_name       String
+  user_name       String
+  email           String
+  password        String
+  department      departments       @relation(fields: [d_id], references: [id])
+  d_id            String            @db.Uuid
+  interests       String
+  course          course[]
+  review          review[]
+  review_replies  review_replies[]
+  questions       questions[]
+  student_answers student_answers[]
+  watchlist       watchlist[]
+}
+
+model staffs {
+  id                  String          @id @default(uuid()) @db.Uuid
+  full_name           String
+  user_name           String
+  email               String
+  password            String
+  d_id                String          @db.Uuid
+  subjects_undertaken String
+  course              course[]
+  staff_answers       staff_answers[]
+  staff_uploads       staff_uploads[]
+}
+
+model departments {
+  id              String     @id @default(uuid()) @db.Uuid
+  department_name String
+  students        students[]
+  course          course[]
+}
+
+model subjects {
+  id       String   @id @default(uuid()) @db.Uuid
+  sub_code String
+  sub_name String
+  course   course[]
+}
+
+model course {
+  id            String          @id @default(uuid()) @db.Uuid
+  title         String
+  staff         staffs          @relation(fields: [st_id], references: [id])
+  st_id         String          @db.Uuid
+  likes         Int
+  dislikes      Int
+  department    departments     @relation(fields: [d_id], references: [id])
+  d_id          String          @db.Uuid
+  subject       subjects        @relation(fields: [sub_id], references: [id])
+  sub_id        String          @db.Uuid
+  uploaded_date DateTime        @default(now())
+  questions     questions[]
+  students      students?       @relation(fields: [studentsId], references: [id])
+  studentsId    String?         @db.Uuid
+  watchlist     watchlist[]
+  staff_uploads staff_uploads[]
+}
+
+model review {
+  id             String           @id @default(uuid()) @db.Uuid
+  student        students         @relation(fields: [s_id], references: [id])
+  s_id           String           @db.Uuid
+  review_content String
+  likes          Int
+  dislikes       Int
+  uploaded_date  DateTime         @default(now())
+  review_replies review_replies[]
+}
+
+model review_replies {
+  id            String   @id @default(uuid()) @db.Uuid
+  review        review   @relation(fields: [r_id], references: [id])
+  r_id          String   @db.Uuid
+  student       students @relation(fields: [s_id], references: [id])
+  s_id          String   @db.Uuid
+  reply_content String
+  likes         Int
+  dislikes      Int
+  uploaded_date DateTime @default(now())
+}
+
+model questions {
+  id              String            @id @default(uuid()) @db.Uuid
+  student         students          @relation(fields: [s_id], references: [id])
+  s_id            String            @db.Uuid
+  course          course            @relation(fields: [c_id], references: [id])
+  c_id            String            @db.Uuid
+  content         String
+  uploaded_date   DateTime          @default(now())
+  student_answers student_answers[]
+  staff_answers   staff_answers[]
+}
+
+model student_answers {
+  id            String    @id @default(uuid()) @db.Uuid
+  student       students  @relation(fields: [s_id], references: [id])
+  s_id          String    @db.Uuid
+  question      questions @relation(fields: [q_id], references: [id])
+  q_id          String    @db.Uuid
+  content       String
+  uploaded_date DateTime  @default(now())
+}
+
+model staff_answers {
+  id            String    @id @default(uuid()) @db.Uuid
+  staff         staffs    @relation(fields: [st_id], references: [id])
+  st_id         String    @db.Uuid
+  question      questions @relation(fields: [q_id], references: [id])
+  q_id          String    @db.Uuid
+  content       String
+  uploaded_date DateTime  @default(now())
+}
+
+model watchlist {
+  id         String   @id @default(uuid()) @db.Uuid
+  student    students @relation(fields: [s_id], references: [id])
+  s_id       String   @db.Uuid
+  course     course   @relation(fields: [c_id], references: [id])
+  c_id       String   @db.Uuid
+  added_date DateTime
+}
+
+model staff_uploads {
+  id     String @id @default(uuid()) @db.Uuid
+  staff  staffs @relation(fields: [st_id], references: [id])
+  st_id  String @db.Uuid
+  course course @relation(fields: [c_id], references: [id])
+  c_id   String @db.Uuid
+}
