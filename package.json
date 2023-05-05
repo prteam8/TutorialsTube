@@ -1,1 +1,25 @@
-{"name":"my-prisma-project","version":"1.0.0","description":"","main":"index.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"keywords":[],"author":"","license":"ISC","devDependencies":{"prisma":"^4.13.0"},"dependencies":{"@prisma/client":"^4.13.0"}}
+{
+    "name": "my-prisma-project",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "prisma": "^4.13.0",
+        "ts-node": "^10.9.1"
+    },
+    "dependencies": {
+        "@faker-js/faker": "^7.6.0",
+        "@prisma/client": "^4.13.0",
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.4"
+    },
+    "prisma": {
+        "seed": "ts-node prisma\\seed.ts"
+    }
+}

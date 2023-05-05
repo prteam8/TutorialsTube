@@ -11,15 +11,15 @@ datasource db {
 }
 
 model students {
-  id              String            @id @default(uuid()) @db.Uuid
-  full_name       String
-  user_name       String
-  email           String
-  password        String
-  department      departments       @relation(fields: [d_id], references: [id])
-  d_id            String            @db.Uuid
-  interests       String
-  course          course[]
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name  String
+  user_name  String
+  email      String
+  password   String
+  department departments @relation(fields: [d_name], references: [department_name])
+  d_name     String
+  interests  String
+
   review          review[]
   review_replies  review_replies[]
   questions       questions[]
@@ -28,12 +28,14 @@ model students {
 }
 
 model staffs {
-  id                  String          @id @default(uuid()) @db.Uuid
-  full_name           String
-  user_name           String
-  email               String
-  password            String
-  d_id                String          @db.Uuid
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name  String
+  user_name  String
+  email      String
+  password   String
+  department departments @relation(fields: [d_name], references: [department_name])
+  d_name     String
+
   subjects_undertaken String
   course              course[]
   staff_answers       staff_answers[]
@@ -41,40 +43,39 @@ model staffs {
 }
 
 model departments {
-  id              String     @id @default(uuid()) @db.Uuid
-  department_name String
+  department_name String     @id
   students        students[]
   course          course[]
+  staffs          staffs[]
 }
 
 model subjects {
-  id       String   @id @default(uuid()) @db.Uuid
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   sub_code String
   sub_name String
   course   course[]
 }
 
 model course {
-  id            String          @id @default(uuid()) @db.Uuid
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title         String
   staff         staffs          @relation(fields: [st_id], references: [id])
   st_id         String          @db.Uuid
   likes         Int
   dislikes      Int
-  department    departments     @relation(fields: [d_id], references: [id])
-  d_id          String          @db.Uuid
+  department    departments     @relation(fields: [d_name], references: [department_name])
+  d_name        String
   subject       subjects        @relation(fields: [sub_id], references: [id])
   sub_id        String          @db.Uuid
   uploaded_date DateTime        @default(now())
   questions     questions[]
-  students      students?       @relation(fields: [studentsId], references: [id])
-  studentsId    String?         @db.Uuid
+  review        review[]
   watchlist     watchlist[]
   staff_uploads staff_uploads[]
 }
 
 model review {
-  id             String           @id @default(uuid()) @db.Uuid
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   student        students         @relation(fields: [s_id], references: [id])
   s_id           String           @db.Uuid
   review_content String
@@ -82,10 +83,12 @@ model review {
   dislikes       Int
   uploaded_date  DateTime         @default(now())
   review_replies review_replies[]
+  course         course?          @relation(fields: [courseId], references: [id])
+  courseId       String?          @db.Uuid
 }
 
 model review_replies {
-  id            String   @id @default(uuid()) @db.Uuid
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   review        review   @relation(fields: [r_id], references: [id])
   r_id          String   @db.Uuid
   student       students @relation(fields: [s_id], references: [id])
@@ -97,7 +100,7 @@ model review_replies {
 }
 
 model questions {
-  id              String            @id @default(uuid()) @db.Uuid
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   student         students          @relation(fields: [s_id], references: [id])
   s_id            String            @db.Uuid
   course          course            @relation(fields: [c_id], references: [id])
@@ -109,7 +112,7 @@ model questions {
 }
 
 model student_answers {
-  id            String    @id @default(uuid()) @db.Uuid
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   student       students  @relation(fields: [s_id], references: [id])
   s_id          String    @db.Uuid
   question      questions @relation(fields: [q_id], references: [id])
@@ -119,7 +122,7 @@ model student_answers {
 }
 
 model staff_answers {
-  id            String    @id @default(uuid()) @db.Uuid
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   staff         staffs    @relation(fields: [st_id], references: [id])
   st_id         String    @db.Uuid
   question      questions @relation(fields: [q_id], references: [id])
@@ -129,16 +132,16 @@ model staff_answers {
 }
 
 model watchlist {
-  id         String   @id @default(uuid()) @db.Uuid
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   student    students @relation(fields: [s_id], references: [id])
   s_id       String   @db.Uuid
   course     course   @relation(fields: [c_id], references: [id])
   c_id       String   @db.Uuid
-  added_date DateTime
+  added_date DateTime @default(now())
 }
 
 model staff_uploads {
-  id     String @id @default(uuid()) @db.Uuid
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   staff  staffs @relation(fields: [st_id], references: [id])
   st_id  String @db.Uuid
   course course @relation(fields: [c_id], references: [id])
